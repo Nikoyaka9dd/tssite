@@ -1,5 +1,4 @@
 import Link from "next/link"
-import { TwitterTimeline } from "@/components/twitter-timeline"
 
 export default function Home() {
   return (
@@ -11,7 +10,6 @@ export default function Home() {
         <p className="profile-text">京都府在住</p>
         <p className="profile-text">所属大学: 京都産業大学・情報理工学部</p>
         <p className="profile-text">所属団体:劇団ケッペキ・電子計算応用部・MAKER'S CLUB・ISE girl's</p>
-        <TwitterTimeline />
       </section>
 
       <section id="career" className="section">
