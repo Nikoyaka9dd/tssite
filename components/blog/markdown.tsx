@@ -25,7 +25,7 @@ export function Markdown({ content }: MarkdownProps) {
         blockquote: ({ node, ...props }) => (
           <blockquote className="border-l-4 border-muted pl-4 italic my-3" {...props} />
         ),
-        code: ({ node, inline, ...props }) =>
+        code: ({ inline, ...props }: { inline?: boolean; [key: string]: any }) =>
           inline ? (
             <code className="bg-muted px-1 py-0.5 rounded text-sm font-mono" {...props} />
           ) : (
