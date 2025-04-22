@@ -2,15 +2,15 @@ import type React from "react"
 import { Inter } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
 import { AuthProvider } from "@/components/auth/auth-provider"
+import { SmoothScroll } from "@/components/smooth-scroll"
 import Header from "@/components/header"
 import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata = {
-  title: "T's Portfolio",
-  description: "徳永智桜のポートフォリオサイト",
-    generator: 'v0.dev'
+  title: "T's log",
+  description: "にこやかのlog site",
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -30,5 +30,3 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   )
 }
 
-
-import './globals.css'
