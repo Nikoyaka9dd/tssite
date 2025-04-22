@@ -10,7 +10,7 @@ const inter = Inter({ subsets: ["latin"] })
 
 export const metadata = {
   title: "T's log",
-  description: "にこやかのlog site",
+  description: "にこやかのログサイト",
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -19,6 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="light">
           <AuthProvider>
+            <SmoothScroll />
             <div className="portfolio-container">
               <Header />
               <main>{children}</main>
