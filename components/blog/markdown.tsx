@@ -25,14 +25,20 @@ export function Markdown({ content }: MarkdownProps) {
         blockquote: ({ node, ...props }) => (
           <blockquote className="border-l-4 border-muted pl-4 italic my-3" {...props} />
         ),
-        code: ({ inline, ...props }: { inline?: boolean; [key: string]: any }) =>
+        code: ({ inline, className, children, ...props }: { inline?: boolean; className?: string; children?: React.ReactNode }) =>
           inline ? (
-            <code className="bg-muted px-1 py-0.5 rounded text-sm font-mono" {...props} />
+            <code className={`bg-muted px-1 py-0.5 rounded text-sm font-mono ${className || ""}`} {...props}>
+              {children}
+            </code>
           ) : (
             <pre className="bg-muted p-4 rounded-md overflow-x-auto my-4">
-              <code className="text-sm font-mono" {...props} />
+              <code className={`text-sm font-mono ${className || ""}`} {...props}>
+                {children}
+              </code>
             </pre>
           ),
+        strong: ({ node, ...props }) => <strong className="font-bold" {...props} />,
+        em: ({ node, ...props }) => <em className="italic" {...props} />,
       }}
     >
       {content}

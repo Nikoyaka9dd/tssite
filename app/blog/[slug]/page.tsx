@@ -14,7 +14,7 @@ import { Markdown } from "@/components/blog/markdown"
 export default function BlogPostPage() {
   const params = useParams()
   const router = useRouter()
-  const { isAdmin } = useAuth()
+  const { isAuthenticated } = useAuth()
   const [post, setPost] = useState<BlogPost | null>(null)
   const slug = params.slug as string
 
@@ -54,7 +54,7 @@ export default function BlogPostPage() {
         <Markdown content={post.content} />
       </article>
 
-      {isAdmin && (
+      {isAuthenticated && (
         <div className="flex gap-4 mt-8">
           <Link href={`/admin/blog/edit/${post.id}`}>
             <Button variant="outline" className="flex items-center gap-2">
