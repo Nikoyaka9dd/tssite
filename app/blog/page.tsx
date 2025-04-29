@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { getBlogPosts } from "@/lib/blog"
 import type { BlogPost } from "@/types/blog"
 
+
 export default function BlogPage() {
   const { isAdmin } = useAuth()
   const [posts, setPosts] = useState<BlogPost[]>([])

@@ -6,7 +6,7 @@ import { createContext, useContext, useEffect, useState } from "react"
 
 // 管理者アカウント情報（実際のプロダクションでは環境変数や安全な認証システムを使用してください）
 const ADMIN_USERNAME = "admin"
-const ADMIN_PASSWORD = "password123"
+const ADMIN_PASSWORD = "Nikoyaka9dd"
 
 interface AuthContextType {
   isAdmin: boolean
