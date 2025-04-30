@@ -15,7 +15,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 export default function LoginPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const callbackUrl = searchParams.get("callbackUrl") || "/admin/blog"
+  const callbackUrl = searchParams?.get("callbackUrl") || "/admin/blog"
 
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
