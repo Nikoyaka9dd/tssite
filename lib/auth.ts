@@ -53,4 +53,5 @@ export const authOptions: NextAuthOptions = {
       return session
     },
   },
+  secret: process.env.NEXTAUTH_SECRET || "your-fallback-secret-for-development",
 }

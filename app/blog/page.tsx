@@ -1,8 +1,6 @@
-import Link from "next/link"
 import { BlogCard } from "@/components/blog/blog-card"
-import { Button } from "@/components/ui/button"
-import { getPosts } from "../../lib/actions"
-import { useAuth } from "@/components/auth/auth-provider"
+import { getPosts } from "@/lib/actions"
+import { AuthButtons } from "@/components/blog/auth-buttons"
 
 export default async function BlogPage() {
   const posts = await getPosts()
@@ -24,18 +22,5 @@ export default async function BlogPage() {
         </div>
       )}
     </div>
-  )
-}
-// クライアントコンポーネントとして分離
-;("use client")
-function AuthButtons() {
-  const { isAuthenticated } = useAuth()
-
-  if (!isAuthenticated) return null
-
-  return (
-    <Link href="/admin/blog/new">
-      <Button>新規イベント追加</Button>
-    </Link>
   )
 }

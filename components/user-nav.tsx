@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useAuth } from "@/components/auth/auth-provider"
+import { useSession, signOut } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -15,12 +15,11 @@ import {
 import { LogIn, LogOut, User, FileText, Plus } from "lucide-react"
 
 export function UserNav() {
-  const { isAuthenticated, logout } = useAuth()
+  const { data: session } = useSession()
   const router = useRouter()
 
   const handleLogout = () => {
-    logout()
-    router.push("/")
+    signOut({ redirect: true, callbackUrl: "/" })
   }
 
   return (
@@ -33,11 +32,11 @@ export function UserNav() {
       <DropdownMenuContent className="w-56" align="end">
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{isAuthenticated ? "管理者" : "一般ユーザー"}</p>
+            <p className="text-sm font-medium leading-none">{session ? "管理者" : "一般ユーザー"}</p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {isAuthenticated ? (
+        {session ? (
           <>
             <DropdownMenuItem asChild>
               <Link href="/admin/blog" className="flex items-center">

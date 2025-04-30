@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { useAuth } from "@/components/auth/auth-provider"
+import { signIn } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -13,7 +13,6 @@ import { AlertCircle } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 
 export default function LoginPage() {
-  const { login, isAuthenticated } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get("callbackUrl") || "/admin/blog"
@@ -23,20 +22,19 @@ export default function LoginPage() {
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
 
-  // すでに認証済みの場合は管理画面にリダイレクト
-  if (isAuthenticated) {
-    router.push(callbackUrl)
-    return null
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
     setIsLoading(true)
 
     try {
-      const success = await login(username, password)
-      if (success) {
+      const result = await signIn("credentials", {
+        username,
+        password,
+        redirect: false,
+      })
+
+      if (result?.ok) {
         router.push(callbackUrl)
       } else {
         setError("ユーザー名またはパスワードが正しくありません。")
