@@ -1,31 +1,17 @@
-"use client"
-
-import { useEffect, useState } from "react"
 import Link from "next/link"
-import { useAuth } from "@/components/auth/auth-provider"
 import { BlogCard } from "@/components/blog/blog-card"
 import { Button } from "@/components/ui/button"
-import { getBlogPosts } from "@/lib/blog"
-import type { BlogPost } from "@/types/blog"
+import { getPosts } from "../../lib/actions"
+import { useAuth } from "@/components/auth/auth-provider"
 
-
-export default function BlogPage() {
-  const { isAdmin } = useAuth()
-  const [posts, setPosts] = useState<BlogPost[]>([])
-
-  useEffect(() => {
-    setPosts(getBlogPosts())
-  }, [])
+export default async function BlogPage() {
+  const posts = await getPosts()
 
   return (
     <div className="section">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">イベント参加など</h1>
-        {isAdmin && (
-          <Link href="/admin/blog/new">
-            <Button>新規イベント追加</Button>
-          </Link>
-        )}
+        <AuthButtons />
       </div>
 
       {posts.length === 0 ? (
@@ -38,5 +24,18 @@ export default function BlogPage() {
         </div>
       )}
     </div>
+  )
+}
+// クライアントコンポーネントとして分離
+;("use client")
+function AuthButtons() {
+  const { isAuthenticated } = useAuth()
+
+  if (!isAuthenticated) return null
+
+  return (
+    <Link href="/admin/blog/new">
+      <Button>新規イベント追加</Button>
+    </Link>
   )
 }

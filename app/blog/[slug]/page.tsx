@@ -1,41 +1,22 @@
-"use client"
-
-import { useEffect, useState } from "react"
 import Link from "next/link"
-import { useParams, useRouter } from "next/navigation"
-import { ArrowLeft, Edit, Trash } from "lucide-react"
-import { useAuth } from "@/components/auth/auth-provider"
-import { Button } from "@/components/ui/button"
-import { deleteBlogPost, getBlogPostBySlug } from "@/lib/blog"
-import type { BlogPost } from "@/types/blog"
-import { formatDate } from "@/lib/utils"
+import { ArrowLeft } from "lucide-react"
 import { Markdown } from "@/components/blog/markdown"
+import { getPostBySlug } from "@/lib/actions"
+import { formatDate } from "@/lib/utils"
+import { BlogActions } from "@/components/blog/blog-actions"
 
-export default function BlogPostPage() {
-  const params = useParams()
-  const router = useRouter()
-  const { isAuthenticated } = useAuth()
-  const [post, setPost] = useState<BlogPost | null>(null)
-  const slug = params.slug as string
-
-  useEffect(() => {
-    const foundPost = getBlogPostBySlug(slug)
-    if (foundPost) {
-      setPost(foundPost)
-    } else {
-      router.push("/blog")
-    }
-  }, [slug, router])
-
-  const handleDelete = () => {
-    if (post && window.confirm("このイベント記録を削除してもよろしいですか？")) {
-      deleteBlogPost(post.id)
-      router.push("/blog")
-    }
-  }
+export default async function BlogPostPage({ params }: { params: { slug: string } }) {
+  const post = await getPostBySlug(params.slug)
 
   if (!post) {
-    return <div className="section">Loading...</div>
+    return (
+      <div className="section">
+        <p>記事が見つかりませんでした。</p>
+        <Link href="/blog" className="text-primary hover:underline">
+          イベント一覧に戻る
+        </Link>
+      </div>
+    )
   }
 
   return (
@@ -49,25 +30,15 @@ export default function BlogPostPage() {
 
       <article className="prose prose-slate max-w-none">
         <h1 className="text-3xl font-bold">{post.title}</h1>
-        <div className="text-sm text-muted-foreground mb-6">{formatDate(post.date)}</div>
+        <div className="text-sm text-muted-foreground mb-6">
+          {formatDate(post.date)}
+          {post.author && <span> • {post.author}</span>}
+        </div>
 
         <Markdown content={post.content} />
       </article>
 
-      {isAuthenticated && (
-        <div className="flex gap-4 mt-8">
-          <Link href={`/admin/blog/edit/${post.id}`}>
-            <Button variant="outline" className="flex items-center gap-2">
-              <Edit className="h-4 w-4" />
-              編集
-            </Button>
-          </Link>
-          <Button variant="destructive" className="flex items-center gap-2" onClick={handleDelete}>
-            <Trash className="h-4 w-4" />
-            削除
-          </Button>
-        </div>
-      )}
+      <BlogActions post={post} />
     </div>
   )
 }

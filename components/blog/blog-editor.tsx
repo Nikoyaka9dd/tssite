@@ -9,9 +9,10 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
-import { createBlogPost, updateBlogPost } from "@/lib/blog"
+import { createPost, updatePost } from "@/lib/actions"
 import type { BlogPost } from "@/types/blog"
 import { Markdown } from "@/components/blog/markdown"
+import { useAuth } from "@/components/auth/auth-provider"
 
 interface BlogEditorProps {
   post?: BlogPost
@@ -19,41 +20,59 @@ interface BlogEditorProps {
 
 export function BlogEditor({ post }: BlogEditorProps) {
   const router = useRouter()
+  const { user } = useAuth()
   const [title, setTitle] = useState(post?.title || "")
   const [content, setContent] = useState(post?.content || "")
   const [date, setDate] = useState(post?.date || new Date().toISOString().split("T")[0])
+  const [author, setAuthor] = useState(post?.author || user?.name || "")
   const [activeTab, setActiveTab] = useState<string>("edit")
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState("")
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError("")
 
     if (!title || !content || !date) {
-      alert("タイトル、内容、日付は必須です。")
+      setError("タイトル、内容、日付は必須です。")
       return
     }
 
-    if (post) {
-      // 更新
-      updateBlogPost({
-        ...post,
-        title,
-        content,
-        date,
-      })
-    } else {
-      // 新規作成
-      createBlogPost({
-        title,
-        content,
-        date,
-      })
-    }
+    try {
+      setIsSubmitting(true)
 
-    router.push("/admin/blog")
+      if (post) {
+        // 更新
+        await updatePost(post.id, {
+          title,
+          content,
+          date,
+          author,
+        })
+      } else {
+        // 新規作成
+        await createPost({
+          title,
+          content,
+          date,
+          author,
+        })
+      }
+
+      router.push("/admin/blog")
+      router.refresh()
+    } catch (err) {
+      console.error("Error saving post:", err)
+      setError(err instanceof Error ? err.message : "保存中にエラーが発生しました。")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {error && <div className="p-3 bg-red-100 text-red-800 rounded-md">{error}</div>}
+
       <div className="space-y-2">
         <Label htmlFor="title">タイトル</Label>
         <Input
@@ -68,6 +87,11 @@ export function BlogEditor({ post }: BlogEditorProps) {
       <div className="space-y-2">
         <Label htmlFor="date">日付</Label>
         <Input id="date" type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="author">著者</Label>
+        <Input id="author" value={author} onChange={(e) => setAuthor(e.target.value)} placeholder="著者名を入力" />
       </div>
 
       <div className="space-y-2">
@@ -106,7 +130,9 @@ export function BlogEditor({ post }: BlogEditorProps) {
         <Button type="button" variant="outline" onClick={() => router.push("/admin/blog")}>
           キャンセル
         </Button>
-        <Button type="submit">{post ? "更新する" : "作成する"}</Button>
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "保存中..." : post ? "更新する" : "作成する"}
+        </Button>
       </div>
     </form>
   )

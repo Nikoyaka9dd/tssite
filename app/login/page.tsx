@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useAuth } from "@/components/auth/auth-provider"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -15,6 +15,9 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 export default function LoginPage() {
   const { login, isAuthenticated } = useAuth()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const callbackUrl = searchParams.get("callbackUrl") || "/admin/blog"
+
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
@@ -22,7 +25,7 @@ export default function LoginPage() {
 
   // すでに認証済みの場合は管理画面にリダイレクト
   if (isAuthenticated) {
-    router.push("/admin/blog")
+    router.push(callbackUrl)
     return null
   }
 
@@ -34,7 +37,7 @@ export default function LoginPage() {
     try {
       const success = await login(username, password)
       if (success) {
-        router.push("/admin/blog")
+        router.push(callbackUrl)
       } else {
         setError("ユーザー名またはパスワードが正しくありません。")
       }

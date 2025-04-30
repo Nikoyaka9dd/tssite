@@ -1,75 +1,53 @@
 "use client"
 
 import type React from "react"
-
-import { createContext, useContext, useEffect, useState } from "react"
-
-// 管理者アカウント情報（実際のプロダクションでは環境変数や安全な認証システムを使用してください）
-const ADMIN_USERNAME = "admin"
-const ADMIN_PASSWORD = "Nikoyaka9dd"
+import { createContext, useContext } from "react"
+import { useSession, signIn, signOut } from "next-auth/react"
 
 interface AuthContextType {
-  isAdmin: boolean
   isAuthenticated: boolean
+  isAdmin: boolean
+  user: { id: string; name: string } | null
   login: (username: string, password: string) => Promise<boolean>
   logout: () => void
 }
 
 const AuthContext = createContext<AuthContextType>({
-  isAdmin: false,
   isAuthenticated: false,
+  isAdmin: false,
+  user: null,
   login: async () => false,
   logout: () => {},
 })
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [isAdmin, setIsAdmin] = useState(false)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-
-  useEffect(() => {
-    // ローカルストレージから認証状態を復元
-    const savedAuth = localStorage.getItem("auth")
-    if (savedAuth) {
-      try {
-        const authData = JSON.parse(savedAuth)
-        setIsAdmin(authData.isAdmin)
-        setIsAuthenticated(authData.isAuthenticated)
-      } catch (error) {
-        console.error("認証データの解析に失敗しました:", error)
-        // 認証データが壊れている場合はリセット
-        localStorage.removeItem("auth")
-      }
-    }
-  }, [])
+  const { data: session, status } = useSession()
+  const isAuthenticated = status === "authenticated"
+  const isAdmin = isAuthenticated
+  const user = session?.user ? { id: session.user as string, name: session.user.name || "" } : null
 
   const login = async (username: string, password: string): Promise<boolean> => {
-    // 実際のプロダクションでは、APIリクエストを使用して認証を行うべきです
-    // ここでは簡易的な認証を行います
-    return new Promise((resolve) => {
-      // 認証の遅延をシミュレート
-      setTimeout(() => {
-        if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-          setIsAdmin(true)
-          setIsAuthenticated(true)
+    try {
+      const result = await signIn("credentials", {
+        username,
+        password,
+        redirect: false,
+      })
 
-          // 認証状態をローカルストレージに保存
-          localStorage.setItem("auth", JSON.stringify({ isAdmin: true, isAuthenticated: true }))
-
-          resolve(true)
-        } else {
-          resolve(false)
-        }
-      }, 500)
-    })
+      return result?.ok || false
+    } catch (error) {
+      console.error("Login error:", error)
+      return false
+    }
   }
 
   const logout = () => {
-    setIsAdmin(false)
-    setIsAuthenticated(false)
-    localStorage.removeItem("auth")
+    signOut({ redirect: false })
   }
 
-  return <AuthContext.Provider value={{ isAdmin, isAuthenticated, login, logout }}>{children}</AuthContext.Provider>
+  return (
+    <AuthContext.Provider value={{ isAuthenticated, isAdmin, user, login, logout }}>{children}</AuthContext.Provider>
+  )
 }
 
 export const useAuth = () => useContext(AuthContext)

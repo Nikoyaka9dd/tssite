@@ -1,35 +1,15 @@
-"use client"
+import {redirect} from "next/navigation"
+import {BlogEditor} from "@/components/blog/blog-editor"
+import {getPostById} from "@/lib/actions"
+import {authOptions} from "@/lib/auth"
 
-import { useEffect, useState } from "react"
-import { useParams, useRouter } from "next/navigation"
-import { useAuth } from "@/components/auth/auth-provider"
-import { BlogEditor } from "@/components/blog/blog-editor"
-import { getBlogPostById } from "@/lib/blog"
-import type { BlogPost } from "@/types/blog"
+export default async function EditBlogPostPage({ params }: { params: { id: string } }) {
 
-export default function EditBlogPostPage() {
-  const { isAuthenticated } = useAuth()
-  const router = useRouter()
-  const params = useParams()
-  const [post, setPost] = useState<BlogPost | null>(null)
-  const id = params.id as string
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.push("/login")
-      return
-    }
 
-    const foundPost = getBlogPostById(id)
-    if (foundPost) {
-      setPost(foundPost)
-    } else {
-      router.push("/admin/blog")
-    }
-  }, [id, isAuthenticated, router])
-
-  if (!isAuthenticated || !post) {
-    return null
+  const post = await getPostById(params.id)
+  if (!post) {
+    redirect("/admin/blog")
   }
 
   return (

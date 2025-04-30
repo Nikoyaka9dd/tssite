@@ -1,39 +1,16 @@
-"use client"
-
-import { useEffect, useState } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { Edit, Plus, Trash } from "lucide-react"
-import { useAuth } from "@/components/auth/auth-provider"
+import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { deleteBlogPost, getBlogPosts } from "@/lib/blog"
-import type { BlogPost } from "@/types/blog"
+import { getPosts } from "@/lib/actions"
 import { formatDate } from "@/lib/utils"
+import { AdminPostActions } from "@/components/blog/admin-post-actions"
+import { redirect } from "next/navigation"
+import { authOptions } from "@/lib/auth"
 
-export default function AdminBlogPage() {
-  const { isAuthenticated } = useAuth()
-  const router = useRouter()
-  const [posts, setPosts] = useState<BlogPost[]>([])
+export default async function AdminBlogPage() {
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.push("/login")
-      return
-    }
 
-    setPosts(getBlogPosts())
-  }, [isAuthenticated, router])
-
-  const handleDelete = (id: string) => {
-    if (window.confirm("このイベント記録を削除してもよろしいですか？")) {
-      deleteBlogPost(id)
-      setPosts(getBlogPosts())
-    }
-  }
-
-  if (!isAuthenticated) {
-    return null
-  }
+  const posts = await getPosts()
 
   return (
     <div className="section">
@@ -56,6 +33,7 @@ export default function AdminBlogPage() {
               <tr className="border-b">
                 <th className="text-left py-2 px-4">タイトル</th>
                 <th className="text-left py-2 px-4">日付</th>
+                <th className="text-left py-2 px-4">著者</th>
                 <th className="text-right py-2 px-4">操作</th>
               </tr>
             </thead>
@@ -68,24 +46,9 @@ export default function AdminBlogPage() {
                     </Link>
                   </td>
                   <td className="py-2 px-4">{formatDate(post.date)}</td>
+                  <td className="py-2 px-4">{post.author || "-"}</td>
                   <td className="py-2 px-4 text-right">
-                    <div className="flex justify-end gap-2">
-                      <Link href={`/admin/blog/edit/${post.id}`}>
-                        <Button variant="outline" size="sm" className="h-8 w-8 p-0">
-                          <Edit className="h-4 w-4" />
-                          <span className="sr-only">編集</span>
-                        </Button>
-                      </Link>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                        onClick={() => handleDelete(post.id)}
-                      >
-                        <Trash className="h-4 w-4" />
-                        <span className="sr-only">削除</span>
-                      </Button>
-                    </div>
+                    <AdminPostActions post={post} />
                   </td>
                 </tr>
               ))}

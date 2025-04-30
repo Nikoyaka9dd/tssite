@@ -4,6 +4,7 @@ export interface BlogPost {
   slug: string
   content: string
   date: string
+  author?: string
   excerpt?: string
   createdAt: string
   updatedAt: string

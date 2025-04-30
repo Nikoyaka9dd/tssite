@@ -13,3 +13,13 @@ export function formatDate(dateString: string): string {
     day: "numeric",
   })
 }
+
+export function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, "") // 特殊文字を削除
+    .replace(/\s+/g, "-") // スペースをハイフンに置換
+    .replace(/--+/g, "-") // 複数のハイフンを単一のハイフンに置換
+    .trim()
+    .substring(0, 100) // 長さを制限
+}
