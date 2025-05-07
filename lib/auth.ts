@@ -1,9 +1,9 @@
 import type { NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 
-// 管理者アカウント情報（実際のプロダクションでは環境変数を使用してください）
-const ADMIN_USERNAME = "admin"
-const ADMIN_PASSWORD = "password123"
+// 環境変数から管理者アカウント情報を取得
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "admin"
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "password123"
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -18,7 +18,7 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
-        // 簡易的な認証（実際のプロダクションではデータベースを使用してください）
+        // 環境変数から取得した認証情報と比較
         if (credentials.username === ADMIN_USERNAME && credentials.password === ADMIN_PASSWORD) {
           return {
             id: "1",
@@ -54,4 +54,5 @@ export const authOptions: NextAuthOptions = {
     },
   },
   secret: process.env.NEXTAUTH_SECRET || "your-fallback-secret-for-development",
+  debug: process.env.NODE_ENV === "development",
 }
