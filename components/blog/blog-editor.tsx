@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { createPost, updatePost } from "@/lib/actions"
 import type { BlogPost } from "@/types/blog"
 import { Markdown } from "@/components/blog/markdown"
-import { useAuth } from "@/components/auth/auth-provider"
+import { useSession } from "next-auth/react"
 
 interface BlogEditorProps {
   post?: BlogPost
@@ -20,11 +20,11 @@ interface BlogEditorProps {
 
 export function BlogEditor({ post }: BlogEditorProps) {
   const router = useRouter()
-  const { user } = useAuth()
+  const { data: session } = useSession()
   const [title, setTitle] = useState(post?.title || "")
   const [content, setContent] = useState(post?.content || "")
   const [date, setDate] = useState(post?.date || new Date().toISOString().split("T")[0])
-  const [author, setAuthor] = useState(post?.author || user?.name || "")
+  const [author, setAuthor] = useState(post?.author || session?.user?.name || "")
   const [activeTab, setActiveTab] = useState<string>("edit")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState("")

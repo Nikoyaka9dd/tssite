@@ -4,11 +4,15 @@ import { Button } from "@/components/ui/button"
 import { getPosts } from "@/lib/actions"
 import { formatDate } from "@/lib/utils"
 import { AdminPostActions } from "@/components/blog/admin-post-actions"
+import { getServerSession } from "next-auth/next"
 import { redirect } from "next/navigation"
-import { authOptions } from "@/lib/auth"
 
 export default async function AdminBlogPage() {
-
+  // サーバーサイドで認証チェック
+  const session = await getServerSession()
+  if (!session) {
+    redirect("/login")
+  }
 
   const posts = await getPosts()
 

@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Edit, Trash } from "lucide-react"
-import { useAuth } from "@/components/auth/auth-provider"
+import { useSession } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { deletePost } from "@/lib/actions"
 import type { BlogPost } from "@/types/blog"
@@ -14,11 +14,11 @@ interface BlogActionsProps {
 }
 
 export function BlogActions({ post }: BlogActionsProps) {
-  const { isAuthenticated } = useAuth()
+  const { data: session } = useSession()
   const router = useRouter()
   const [isDeleting, setIsDeleting] = useState(false)
 
-  if (!isAuthenticated) {
+  if (!session) {
     return null
   }
 

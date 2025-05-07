@@ -1,22 +1,12 @@
-"use client"
-
-import { useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { useAuth } from "@/components/auth/auth-provider"
+import { redirect } from "next/navigation"
+import { getServerSession } from "next-auth/next"
 import { BlogEditor } from "@/components/blog/blog-editor"
 
-export default function NewBlogPostPage() {
-  const { isAuthenticated } = useAuth()
-  const router = useRouter()
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.push("/login")
-    }
-  }, [isAuthenticated, router])
-
-  if (!isAuthenticated) {
-    return null
+export default async function NewBlogPostPage() {
+  // サーバーサイドで認証チェック
+  const session = await getServerSession()
+  if (!session) {
+    redirect("/login")
   }
 
   return (
