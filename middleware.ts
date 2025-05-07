@@ -9,7 +9,7 @@ export async function middleware(request: NextRequest) {
   if (pathname.startsWith("/admin")) {
     const token = await getToken({
       req: request,
-      secret: process.env.NEXTAUTH_SECRET,
+      secret: process.env.NEXTAUTH_SECRET || "your-fallback-secret-for-development",
     })
 
     // 認証されていない場合はログインページにリダイレクト
