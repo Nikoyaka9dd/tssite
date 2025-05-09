@@ -66,7 +66,7 @@ export default function Portfolio() {
         <p className="profile-text">2005年5月7日生まれ</p>
         <p className="profile-text">京都府在住</p>
         <p className="profile-text">所属大学: 京都産業大学・情報理工学部</p>
-        <p className="profile-text">所属団体:劇団ケッペキ・電子計算応用部・MAKER'S CLUB・ISE girl's</p>
+        <p className="profile-text">所属団体:劇団ケッペキ・電子計算応用部・MAKER'S CLUB・プレゼン研究会・ISE girl's</p>
       </section>
 
       <section id="career" className="section">
