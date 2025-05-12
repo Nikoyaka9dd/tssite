@@ -3,47 +3,45 @@
 import type React from "react"
 
 import { useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
-import { signIn } from "next-auth/react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { AlertCircle } from 'lucide-react'
+import { AlertCircle } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 
 export default function LoginPage() {
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const callbackUrl = searchParams?.get("callbackUrl") || "/admin/blog"
-
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
 
+  // 代替ログイン処理を使用する場合
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
     setIsLoading(true)
 
     try {
-      // signInメソッドを呼び出す際に明示的にPOSTメソッドを指定
-      const result = await signIn("credentials", {
-        username,
-        password,
-        redirect: false,
-        callbackUrl,
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
       })
 
-      if (result?.ok) {
-        router.push(callbackUrl)
+      const data = await response.json()
+
+      if (response.ok && data.success) {
+        router.push("/admin/blog")
+        router.refresh()
       } else {
-        setError("ユーザー名またはパスワードが正しくありません。")
+        setError("ログインに失敗しました。ユーザー名とパスワードを確認してください。")
       }
     } catch (err) {
       console.error("Login error:", err)
-      setError("ログイン中にエラーが発生しました。")
+      setError("ログイン処理中にエラーが発生しました。")
     } finally {
       setIsLoading(false)
     }
@@ -55,9 +53,11 @@ export default function LoginPage() {
         <CardHeader>
           <CardTitle>管理者ログイン</CardTitle>
           <CardDescription>管理画面にアクセスするにはログインしてください。</CardDescription>
+          <CardDescription className="text-sm text-muted-foreground mt-2">
+            テスト用認証情報: admin / password123
+          </CardDescription>
         </CardHeader>
-        {/* method="post"を明示的に指定 */}
-        <form onSubmit={handleSubmit} method="post">
+        <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             {error && (
               <Alert variant="destructive">
@@ -70,11 +70,9 @@ export default function LoginPage() {
               <Input
                 id="username"
                 type="text"
-                name="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
-                autoComplete="username"
               />
             </div>
             <div className="space-y-2">
@@ -82,11 +80,9 @@ export default function LoginPage() {
               <Input
                 id="password"
                 type="password"
-                name="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                autoComplete="current-password"
               />
             </div>
           </CardContent>
