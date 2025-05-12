@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { AlertCircle } from "lucide-react"
+import { AlertCircle } from 'lucide-react'
 import { Alert, AlertDescription } from "@/components/ui/alert"
 
 export default function LoginPage() {
@@ -28,10 +28,12 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
+      // signInメソッドを呼び出す際に明示的にPOSTメソッドを指定
       const result = await signIn("credentials", {
         username,
         password,
         redirect: false,
+        callbackUrl,
       })
 
       if (result?.ok) {
@@ -40,8 +42,8 @@ export default function LoginPage() {
         setError("ユーザー名またはパスワードが正しくありません。")
       }
     } catch (err) {
+      console.error("Login error:", err)
       setError("ログイン中にエラーが発生しました。")
-      console.error(err)
     } finally {
       setIsLoading(false)
     }
@@ -54,7 +56,8 @@ export default function LoginPage() {
           <CardTitle>管理者ログイン</CardTitle>
           <CardDescription>管理画面にアクセスするにはログインしてください。</CardDescription>
         </CardHeader>
-        <form onSubmit={handleSubmit}>
+        {/* method="post"を明示的に指定 */}
+        <form onSubmit={handleSubmit} method="post">
           <CardContent className="space-y-4">
             {error && (
               <Alert variant="destructive">
@@ -67,6 +70,7 @@ export default function LoginPage() {
               <Input
                 id="username"
                 type="text"
+                name="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
@@ -78,6 +82,7 @@ export default function LoginPage() {
               <Input
                 id="password"
                 type="password"
+                name="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
