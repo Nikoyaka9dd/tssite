@@ -53,9 +53,6 @@ export default function LoginPage() {
         <CardHeader>
           <CardTitle>管理者ログイン</CardTitle>
           <CardDescription>管理画面にアクセスするにはログインしてください。</CardDescription>
-          <CardDescription className="text-sm text-muted-foreground mt-2">
-            テスト用認証情報: admin / password123
-          </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
