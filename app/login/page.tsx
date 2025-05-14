@@ -21,49 +21,6 @@ export default function LoginPage() {
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
-    setIsLoading(true)
-
-    try {
-      // 直接フェッチを使用してログイン処理を行う
-      const response = await fetch("/api/auth/callback/credentials", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username,
-          password,
-          redirect: false,
-          callbackUrl,
-        }),
-      })
-
-      if (response.ok) {
-        // 成功した場合はリダイレクト
-        router.push(callbackUrl)
-        router.refresh()
-      } else {
-        // エラーレスポンスの処理
-        try {
-          const errorData = await response.json()
-          setError(`ログインに失敗しました: ${errorData.error || "認証エラー"}`)
-        } catch (jsonError) {
-          // JSONパースエラーの場合はテキストで取得
-          const errorText = await response.text()
-          setError(`ログインに失敗しました: ${errorText || `ステータスコード: ${response.status}`}`)
-        }
-      }
-    } catch (err) {
-      console.error("Login error:", err)
-      setError(`ログイン中にエラーが発生しました: ${err instanceof Error ? err.message : String(err)}`)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
   // 代替ログイン処理 - 直接APIを呼び出す
   const handleDirectLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -79,16 +36,21 @@ export default function LoginPage() {
         body: JSON.stringify({ username, password }),
       })
 
+      // まずテキストとして応答を読み込む
+      const responseText = await response.text()
+
       if (response.ok) {
+        // 成功した場合はリダイレクト
         router.push(callbackUrl)
         router.refresh()
       } else {
+        // エラーの場合、JSONとして解析を試みる
         try {
-          const errorData = await response.json()
+          const errorData = JSON.parse(responseText)
           setError(`ログインに失敗しました: ${errorData.error || "認証エラー"}`)
         } catch (jsonError) {
-          const errorText = await response.text()
-          setError(`ログインに失敗しました: ${errorText || `ステータスコード: ${response.status}`}`)
+          // JSONとして解析できない場合はテキストをそのまま使用
+          setError(`ログインに失敗しました: ${responseText || `ステータスコード: ${response.status}`}`)
         }
       }
     } catch (err) {

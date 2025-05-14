@@ -19,13 +19,13 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
-        if (credentials.username === validUsername && credentials.password === validPassword) {
-          return {
-            id: "1",
-            name: "管理者",
-            email: "admin@example.com",
-          }
-        }
+        // if (credentials.username === validUsername && credentials.password === validPassword) {
+        //   return {
+        //     id: "1",
+        //     name: "管理者",
+        //     email: "admin@example.com",
+        //   }
+        // }
 
         return null
       },
